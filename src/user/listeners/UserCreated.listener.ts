@@ -13,8 +13,14 @@ export class UserCreatedListener {
 
   @OnEvent('user.created')
   async handleUserCreatedEvent(event: UserCreatedEvent) {
-    const verificationToken = this.authService.generateVerificationToken(event.userId.toString(), event.email);
+    const verificationToken = this.authService.generateVerificationToken(
+      event.userId.toString(),
+      event.email,
+    );
 
-    await this.mailService.sendVerificationEmail(event.email, verificationToken);
+    await this.mailService.sendVerificationEmail(
+      event.email,
+      verificationToken,
+    );
   }
 }

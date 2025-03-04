@@ -1,7 +1,14 @@
-import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
+import {
+  registerDecorator,
+  ValidationOptions,
+  ValidationArguments,
+} from 'class-validator';
 
-export function Match(property: string, validationOptions?: ValidationOptions) {
-  return (object: any, propertyName: string) => {
+export function Match<T extends object>(
+  property: keyof T & string,
+  validationOptions?: ValidationOptions,
+) {
+  return (object: T, propertyName: string) => {
     registerDecorator({
       name: 'Match',
       target: object.constructor,
@@ -9,14 +16,14 @@ export function Match(property: string, validationOptions?: ValidationOptions) {
       options: validationOptions,
       constraints: [property],
       validator: {
-        validate(value: any, args: ValidationArguments) {
-          const [relatedPropertyName] = args.constraints;
-          const relatedValue = (args.object as any)[relatedPropertyName];
+        validate(value: string, args: ValidationArguments) {
+          const relatedPropertyName = args.constraints[0] as keyof T & string;
+          const relatedValue = (args.object as T)[relatedPropertyName];
           return value === relatedValue;
         },
         defaultMessage(args: ValidationArguments) {
-          const [relatedPropertyName] = args.constraints;
-          return `${propertyName} must match ${relatedPropertyName}`;
+          const relatedPropertyName = args.constraints[0] as string;
+          return `${args.property} must match ${relatedPropertyName}`;
         },
       },
     });

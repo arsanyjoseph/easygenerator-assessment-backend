@@ -1,32 +1,42 @@
-
-import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
-import { validate } from 'class-validator';
+import {
+  PipeTransform,
+  Injectable,
+  ArgumentMetadata,
+  BadRequestException,
+} from '@nestjs/common';
+import { validate, ValidationError } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 
+type ClassConstructor<T = unknown> = new (...args: any[]) => T;
+
 @Injectable()
-export class ValidationPipe implements PipeTransform<any> {
-    async transform(value: any, { metatype }: ArgumentMetadata) {
-        if (!metatype || !this.toValidate(metatype)) {
-            return value;
-        }
-        const object = plainToInstance(metatype, value);
-        const errors = await validate(object);
-        if (errors.length > 0) {
-            throw new BadRequestException(this.formatErrors(errors));
-        }
-        return value;
+export class ValidationPipe<T extends object>
+  implements PipeTransform<unknown>
+{
+  async transform(value: unknown, { metatype }: ArgumentMetadata) {
+    if (!metatype || !this.toValidate(metatype)) {
+      return value;
     }
 
-    private toValidate(metatype: Function): boolean {
-        const types: Function[] = [String, Boolean, Number, Array, Object];
-        return !types.includes(metatype);
+    const object = plainToInstance(metatype as ClassConstructor<T>, value);
+    const errors = await validate(object);
+
+    if (errors.length > 0) {
+      throw new BadRequestException(this.formatErrors(errors));
     }
 
+    return value;
+  }
 
-    private formatErrors(errors: any[]) {
-        return errors.map(err => ({
-            property: err.property,
-            constraints: err.constraints,
-        }));
-    }
+  private toValidate(metatype: unknown): metatype is ClassConstructor {
+    const types: ClassConstructor[] = [String, Boolean, Number, Array, Object];
+    return !types.includes(metatype as ClassConstructor);
+  }
+
+  private formatErrors(errors: ValidationError[]) {
+    return errors.map((err) => ({
+      property: err.property,
+      constraints: err.constraints,
+    }));
+  }
 }

@@ -9,9 +9,12 @@ import { UserCreatedListener } from './listeners/UserCreated.listener';
 import { AuthService } from 'src/auth/auth.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]), MailModule],
+  imports: [
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MailModule,
+  ],
   providers: [UserService, PasswordService, AuthService, UserCreatedListener],
   controllers: [UserController],
   exports: [UserService],
 })
-export class UserModule { }
+export class UserModule {}

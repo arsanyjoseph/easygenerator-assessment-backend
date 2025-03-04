@@ -1,8 +1,8 @@
-import { Types } from "mongoose";
+import { Types } from 'mongoose';
 
 export class UserCreatedEvent {
-    constructor(
-        public readonly userId: Types.ObjectId,
-        public readonly email: string,
-    ) { }
+  constructor(
+    public readonly userId: Types.ObjectId,
+    public readonly email: string,
+  ) {}
 }

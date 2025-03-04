@@ -19,9 +19,7 @@ import { MailModule } from './mail/mail.module';
     }),
     WinstonModule.forRoot(winstonConfig),
     EventEmitterModule.forRoot(),
-    MongooseModule.forRoot(
-      process.env.DB_URI || ''
-    ),
+    MongooseModule.forRoot(process.env.DB_URI || ''),
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     AuthModule,
     UserModule,
@@ -31,4 +29,4 @@ import { MailModule } from './mail/mail.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
