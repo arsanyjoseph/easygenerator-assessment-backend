@@ -1,5 +1,5 @@
-import { Body, Controller, Get, HttpCode, Post, Req, Request, Res } from '@nestjs/common';
-import { Response, Request as ExpressRequest } from 'express';
+import { Body, Controller, Get, HttpCode, Post, Req, Request, } from '@nestjs/common';
+import { Request as ExpressRequest } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto, LoginResponseDto } from 'src/dtos/auth/login.dto';
 import { Public } from 'src/decorators/public.decorator';
@@ -21,19 +21,9 @@ export class AuthController {
     @HttpCode(200)
     @Public()
     @Post('login')
-    async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response
-    ): Promise<{ access_token: string }> {
-        const { access_token, refresh_token } = await this.authService.login(loginDto);
-
-        res.cookie('refresh_token', refresh_token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            path: '/auth/refresh-token',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-
-        return { access_token };
+    async login(@Body() loginDto: LoginDto
+    ) {
+        return await this.authService.login(loginDto);
     }
 
     @ApiOperation({ summary: 'Refresh access token' })
@@ -44,9 +34,9 @@ export class AuthController {
     })
     @HttpCode(200)
     @Post('refresh-token')
-    refreshToken(@Req() req: ExpressRequest) {
+    async refreshToken(@Req() req: ExpressRequest) {
         const refreshToken = req.cookies['refresh_token'];
-        return this.authService.refreshToken(refreshToken);
+        return await this.authService.refreshToken(refreshToken);
     }
 
     @ApiOperation({ summary: 'Verify User' })
@@ -70,6 +60,6 @@ export class AuthController {
     })
     @Get('profile')
     profile(@Request() request) {
-        return request.user;
+        return this.authService.getProfile(request.user.sub);
     }
 }

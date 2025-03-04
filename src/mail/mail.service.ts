@@ -17,7 +17,7 @@ export class MailService {
     }
 
     async sendVerificationEmail(email: string, token: string): Promise<void> {
-        const verificationLink = `${process.env.CLIENT_URL}/verify-email?token=${token}`;
+        const verificationLink = `${process.env.CLIENT_URL}/verify-user?token=${token}`;
         const emailHtml = `
             <h1>Email Verification</h1>
             <p>Please click the link below to verify your email address:</p>

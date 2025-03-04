@@ -38,6 +38,14 @@ export class AuthService {
         };
     }
 
+    async getProfile(id: string) {
+        const user = await this.usersService.findOneById(id);
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
+
     async verifyUser(token: string) {
         const payload = this.jwtService.verify<JWTPayload>(token, {
             secret: process.env.JWT_VERIFICATION_TOKEN_SECRET,

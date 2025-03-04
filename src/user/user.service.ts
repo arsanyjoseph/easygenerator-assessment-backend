@@ -34,4 +34,8 @@ export class UserService {
     async findOneByEmail(email: string): Promise<UserDocument | null> {
         return this.userModel.findOne({ email }).select('+password');
     }
+
+    async findOneById(id: string): Promise<UserDocument | null> {
+        return this.userModel.findById(id);
+    }
 }
